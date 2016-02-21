@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+#
+# solar-flare-alert 1.0
+
+# BASH MODES
+set -u
+set -o pipefail
+
+# CONSTANTS
+readonly home_dir="$( cd "$( dirname $0 )" ; pwd )"
+readonly includes_dir="${home_dir}/includes"
+
+# INCLUDES
+source "${includes_dir}/bash-project.sh"
+source "${includes_dir}/solar-flare-alert-vars.sh"
+source "${includes_dir}/solar-flare-alert-functions.sh"
+
+# MAIN
+main() {
+  check_dependencies
+  update_flare_data
+
+  # Get last flare event data
+  last_flare_event="$( jq .max_class "${flare_data}" | sed 's/"//g' )"
+  last_flare_event_time="$( jq .begin_time "${flare_data}" | sed 's/"//g' )"
+  last_flare_event_class="$( echo "${last_flare_event}" | grep -o -E "${class_grep_string}" )"
+  last_flare_event_scale="$( echo "${last_flare_event}" | sed "s/${last_flare_event_class}//g" )"
+  last_flare_event_md5="$( echo "${min_class_to_alert},${last_flare_event},${last_flare_event_time}" | ${md5_bin_name} )"
+
+  # Get conditions to alert on
+  alert_class="$( echo "${min_class_to_alert}" | grep -o -E "${class_grep_string}" )"
+  alert_scale="$( echo "${min_class_to_alert}" | sed "s/${alert_class}//g" )"
+
+  # Determine "score" of the last flare event
+  case ${last_flare_event_class} in
+    "A") last_flare_score=$( echo "scale=2; ${A_score} + ${last_flare_event_scale}" | bc ) ;;
+    "B") last_flare_score=$( echo "scale=2; ${B_score} + ${last_flare_event_scale}" | bc ) ;;
+    "C") last_flare_score=$( echo "scale=2; ${C_score} + ${last_flare_event_scale}" | bc ) ;;
+    "M") last_flare_score=$( echo "scale=2; ${M_score} + ${last_flare_event_scale}" | bc ) ;;
+    "X") last_flare_score=$( echo "scale=2; ${X_score} + ${last_flare_event_scale}" | bc ) ;;
+  esac
+
+  # Determine "score" of event to alert on
+  case ${alert_class} in
+    "A") alert_flare_score=$( echo "scale=2; ${A_score} + ${alert_scale}" | bc ) ;;
+    "B") alert_flare_score=$( echo "scale=2; ${B_score} + ${alert_scale}" | bc ) ;;
+    "C") alert_flare_score=$( echo "scale=2; ${C_score} + ${alert_scale}" | bc ) ;;
+    "M") alert_flare_score=$( echo "scale=2; ${M_score} + ${alert_scale}" | bc ) ;;
+    "X") alert_flare_score=$( echo "scale=2; ${X_score} + ${alert_scale}" | bc ) ;;
+  esac
+
+  # Store md5 hash
+  last_alert_md5="$( cat "${last_event_hash_file}" )"
+
+  # If last event md5 doesn't match the last alert md5, send an alert.
+  if [ "${last_flare_event_md5}" != "${last_alert_md5}" ]; then
+
+    # Test if the last flare event score exceeds the alert threshold
+    if [ $( echo "scale=2; ${last_flare_score} >= ${alert_flare_score}" | bc ) -eq 1 ]; then
+
+      msg "Sending an alert"
+      # use built-in send_mail_alert function, or add your own here!
+      #send_mail_alert
+
+      # Record latest flare event hash to file to prevent alerting for the same event.
+      echo "${last_flare_event_md5}" > "${last_event_hash_file}"
+    else
+      msg "Last flare event does not exceed alert threshold."
+    fi
+  else
+    msg "Alert has already been sent (MD5 matched)."
+  fi
+
+}
+
+main $@
