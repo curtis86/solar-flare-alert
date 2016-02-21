@@ -3,9 +3,9 @@
 # CONSTANTS
 readonly project_name="solar-flare-alert"
 readonly project_version="1.0"
-readonly data_dir="${home_dir}/data"
+readonly data_dir="${home_dir}/data" ; [ ! -d "${data_dir}" ] && mkdir "${data_dir}"
 readonly flare_data="${data_dir}/latest-xray-event.json"
-readonly last_event_hash_file="${data_dir}/last_event.md5" ; [ ! -d "${last_event_hash_file}" ] && touch "${last_event_hash_file}"
+readonly last_event_hash_file="${data_dir}/last_event.md5" ; [ ! -f "${last_event_hash_file}" ] && touch "${last_event_hash_file}"
 readonly md5_bin_name="md5sum"
 readonly dependencies=( "wget" "${md5_bin_name}" "mail" "jq" "mail" )
 readonly email_to_notify=( "your_email_address_here" )
