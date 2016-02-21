@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 #
-# solar-flare-alert 1.0
+# solar-flare-alert 1.0: Send an alert based upon solar flare activity
+# Author: Curtis K
+# Github: https://github.com/curtis86
 
 # BASH MODES
 set -u

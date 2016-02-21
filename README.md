@@ -16,7 +16,7 @@ The above are easily installed on most Linux distributions (eg: `yum install bc`
 
 ## C. Supported Systems
 
-Any system with BASH 3.2+ (not test on older versions).
+Any system with BASH 3.2+ (not tested on older versions).
 
 ### Installation
 
