@@ -11,6 +11,7 @@ readonly dependencies=( "wget" "${md5_bin_name}" "mail" "jq" "mail" )
 readonly email_to_notify=( "your_email_address_here" )
 min_class_to_alert="A1" ; readonly min_class_to_alert="$( echo "${min_class_to_alert}" | tr '[a-z]' '[A-Z]' )"
 readonly class_grep_string="A|B|C|M|X"
+readonly data_update_timeout_seconds=10
 
 readonly A_score="10"
 readonly B_score="20"

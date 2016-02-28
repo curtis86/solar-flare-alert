@@ -8,7 +8,7 @@ check_dependencies() {
 
 update_flare_data() {
   msg "Updating JSON data..."
-  cd "${data_dir}" && wget -q -N http://services.swpc.noaa.gov/products/latest-xray-event.json
+  cd "${data_dir}" && wget --timeout=${data_update_timeout_seconds} -q -N http://services.swpc.noaa.gov/products/latest-xray-event.json
   [ $? -ne 0 ] && abrt "Unable to retreive latest xray event data."
 }
 
