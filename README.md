@@ -3,6 +3,7 @@
 ## A. Summary
 
 A script to generate alerts on solar flare events, using NOAA SWPC JSON data on the latest x-ray events from our sun.
+Alternatively use this script to log solar flare event data (for example, https://spaceweather.xyz), create a flare event timeline, or even a Nagios check script! Includes a built-in function `send_mail_alert` to send a simple mail alert.
 
 ## B. Dependencies
 
@@ -12,7 +13,7 @@ A script to generate alerts on solar flare events, using NOAA SWPC JSON data on 
  * mail
  * md5 or md5sum
 
-The above are easily installed on most Linux distributions (eg: `yum install bc`, `apt-get install bc`, etc)
+The above are easily installed on most Linux distributions (eg: `yum install bc`, `apt-get install bc`, `brew install jq`, etc)
 
 ## C. Supported Systems
 
